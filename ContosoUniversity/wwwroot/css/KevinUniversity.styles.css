@@ -1,0 +1,70 @@
+﻿/* KevinUniversity.styles.css */
+
+/* Basic styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: #343a40;
+}
+
+header {
+    background: linear-gradient(90deg, #ff5f6d, #ffc371);
+    color: #fff;
+}
+
+header .navbar-brand {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.navbar-nav .nav-link {
+    color: #fff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #343a40 !important;
+    text-decoration: underline;
+}
+
+footer {
+    background: linear-gradient(90deg, #ffc371, #ff5f6d);
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Container and Main */
+.container {
+    margin-top: 2rem;
+}
+
+main {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+footer a {
+    color: #343a40;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: #ff5f6d;
+    border-color: #ff5f6d;
+}
+
+.btn-primary:hover {
+    background-color: #e54e5c;
+    border-color: #e54e5c;
+}
