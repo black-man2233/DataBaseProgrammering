@@ -1,0 +1,25 @@
+﻿@model RestRes.ViewModels.ReservationAddViewModel
+
+<h2>Add a Reservation</h2>
+
+<form asp-action="Add" method="post">
+    <div class="form-group">
+        <label for="RestaurantName">Restaurant Name</label>
+        <input asp-for="Reservation.RestaurantName" class="form-control" />
+        @Html.ValidationMessageFor(model => model.Reservation.RestaurantName)
+    </div>
+
+    <div class="form-group">
+        <label for="Date">Reservation Date and Time</label>
+        <input asp-for="Reservation.Date" class="form-control" />
+        @Html.ValidationMessageFor(model => model.Reservation.Date)
+    </div>
+
+    <div class="form-group">
+        <label for="RestaurantId">Restaurant</label>
+        <input asp-for="Reservation.RestaurantId" class="form-control" />
+        @Html.ValidationMessageFor(model => model.Reservation.RestaurantId)
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Reservation</button>
+</form>

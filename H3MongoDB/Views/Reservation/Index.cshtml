@@ -1,0 +1,54 @@
+﻿@model RestRes.ViewModels.ReservationListViewModel
+
+<h1>Reservations</h1>
+
+@if (TempData["ReservationDeleted"] != null)
+{
+    <p class="text-success">@TempData["ReservationDeleted"]</p>
+}
+
+@if (Model.ReservationGroups == null || !Model.ReservationGroups.Any())
+{
+    <p>No reservations found.</p>
+}
+else
+{
+    // Loop through each restaurant group
+    foreach (var group in Model.ReservationGroups)
+    {
+        <h2>@group.RestaurantName</h2>
+
+        @if (group.Reservations == null || !group.Reservations.Any())
+        {
+            <p>No reservations for this restaurant.</p>
+        }
+        else
+        {
+            <table class="table table-condensed table-bordered">
+                <thead>
+                <tr>
+                    <th>Date and Time</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var reservation in group.Reservations)
+                {
+                    <tr>
+                        <td>@reservation.Date.ToLocalTime()</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@reservation.Id">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@reservation.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+
+        <!-- Add Reservation button for this restaurant -->
+        <div>
+            <a asp-action="Add" asp-route-restaurantId="@group.RestaurantId" class="btn btn-primary">Add Reservation</a>
+        </div>
+    }
+}

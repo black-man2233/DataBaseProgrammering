@@ -1,0 +1,39 @@
+﻿@model RestRes.ViewModels.RestaurantListViewModel
+
+<h2>Restaurants</h2>
+
+@if (TempData["RestaurantDeleted"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["RestaurantDeleted"]
+    </div>
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Cuisine</th>
+        <th>Borough</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var restaurant in Model.Restaurants)
+    {
+        <tr>
+            <td>@restaurant.Id</td>
+            <td>@restaurant.Name</td>
+            <td>@restaurant.Cuisine</td>
+            <td>@restaurant.Borough</td>
+            <td>
+                <a href="@Url.Action("Edit", "Restaurant", new { id = restaurant.Id })">Edit</a> |
+                <a href="@Url.Action("Delete", "Restaurant", new { id = restaurant.Id })">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Add", "Restaurant")" class="btn btn-primary">Add New Restaurant</a>
