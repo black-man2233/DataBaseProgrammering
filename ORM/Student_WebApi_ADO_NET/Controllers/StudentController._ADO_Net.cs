@@ -23,7 +23,7 @@ namespace Student_WebApi_ADO_Net.Controllers
 
         [HttpGet("GetStudents_ADO_Net")]
         public async Task<IActionResult> GetStudents_ADO_Net(string UserName = "No Name",
-                                                             bool IncludeRelations = true)
+            bool IncludeRelations = true)
         {
             try
             {
@@ -37,7 +37,8 @@ namespace Student_WebApi_ADO_Net.Controllers
                     List<StudentDto> StudentDtoList;
 
                     StudentDtoList = StudentList.Adapt<StudentDto[]>().ToList();
-                    this._logger.LogInfo($"All Students have been read from GetStudents_ADO_Net action by {UserName}. No Releations Included");
+                    this._logger.LogInfo(
+                        $"All Students have been read from GetStudents_ADO_Net action by {UserName}. No Releations Included");
                     return Ok(StudentList);
                 }
                 else
@@ -47,60 +48,71 @@ namespace Student_WebApi_ADO_Net.Controllers
 
                     List<StudentWithAllRelations_ADO_Net> StudentWithAllRelations_ADO_Net_List =
                         new List<StudentWithAllRelations_ADO_Net>();
-                    StudentWithAllRelations_ADO_Net_List = StudentWithAllRelations_ADO_Net_Object.GetDataWithRelations<StudentWithAllRelations_ADO_Net>(DatabaseCommandStrings.SQLString_SP);
-                    this._logger.LogInfo($"All Students have been read from GetStudents_ADO_Net action by {UserName}. Relations Included");
+                    StudentWithAllRelations_ADO_Net_List =
+                        StudentWithAllRelations_ADO_Net_Object.GetDataWithRelations<StudentWithAllRelations_ADO_Net>(
+                            DatabaseCommandStrings.SQLString_SP);
+                    this._logger.LogInfo(
+                        $"All Students have been read from GetStudents_ADO_Net action by {UserName}. Relations Included");
                     return Ok(StudentWithAllRelations_ADO_Net_List);
                 }
             }
             catch (Exception Error)
             {
-                this._logger.LogError($"Something went wrong inside GetStudents_ADO_Net action for {UserName} : {Error.Message}");
-                return StatusCode((int)HttpStatusCode.InternalServerError, $"Internal server error : {Error.ToString()}");
+                this._logger.LogError(
+                    $"Something went wrong inside GetStudents_ADO_Net action for {UserName} : {Error.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    $"Internal server error : {Error.ToString()}");
             }
         }
 
         [HttpGet("GetStudent_ADO_Net/{StudentID}")]
         public async Task<IActionResult> GetStudent_ADO_Net(int StudentID,
-                                                            string UserName = "No Name",
-                                                            bool IncludeRelations = true)
+            string UserName = "No Name",
+            bool IncludeRelations = true)
         {
             try
             {
                 // Implementer kode her
 
-                this._logger.LogInfo($"Student with StudentID : {StudentID} have been read from GetStudent_ADO_Net action by {UserName}. Relations Included : {IncludeRelations}");
+                this._logger.LogInfo(
+                    $"Student with StudentID : {StudentID} have been read from GetStudent_ADO_Net action by {UserName}. Relations Included : {IncludeRelations}");
                 return Ok(null);
             }
             catch (Exception Error)
             {
-                this._logger.LogError($"Something went wrong inside GetStudent_ADO_Net action for {UserName} : {Error.Message}");
-                return StatusCode((int)HttpStatusCode.InternalServerError, $"Internal server error : {Error.ToString()}");
+                this._logger.LogError(
+                    $"Something went wrong inside GetStudent_ADO_Net action for {UserName} : {Error.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    $"Internal server error : {Error.ToString()}");
             }
         }
 
         [HttpGet("GetStudentsInTeam_ADO_Net/{TeamID}")]
         public async Task<IActionResult> GetStudentsInTeam_ADO_Net(int TeamID,
-                                                                   string UserName = "No Name",
-                                                                   bool IncludeRelations = true)
+            string UserName = "No Name",
+            bool IncludeRelations = true)
         {
             try
             {
                 // Implementer kode her
 
-                this._logger.LogInfo($"All Students within TeamID : {TeamID} has been read from GetStudentsInTeam_ADO_Net action by {UserName}. Relations Included : {IncludeRelations}");
+                this._logger.LogInfo(
+                    $"All Students within TeamID : {TeamID} has been read from GetStudentsInTeam_ADO_Net action by {UserName}. Relations Included : {IncludeRelations}");
                 return Ok(null);
             }
             catch (Exception Error)
             {
-                this._logger.LogError($"Something went wrong inside GetStudentsInTeam_ADO_Net action for {UserName} : {Error.Message}");
-                return StatusCode((int)HttpStatusCode.InternalServerError, $"Internal server error : {Error.ToString()}");
+                this._logger.LogError(
+                    $"Something went wrong inside GetStudentsInTeam_ADO_Net action for {UserName} : {Error.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    $"Internal server error : {Error.ToString()}");
             }
         }
 
         // POST: api/Student
         [HttpPost("CreateStudent_ADO_Net")]
         public async Task<IActionResult> CreateStudent_ADO_Net([FromBody] StudentForSaveDto StudentForSaveDto_Object,
-                                                                string UserName = "No Name")
+            string UserName = "No Name")
         {
             try
             {
@@ -127,23 +139,26 @@ namespace Student_WebApi_ADO_Net.Controllers
             }
             catch (Exception Error)
             {
-                _logger.LogError($"Something went wrong inside CreateStudent_ADO_Net action for {UserName}: {Error.Message}");
-                return StatusCode((int)HttpStatusCode.InternalServerError, $"Internal server error : {Error.ToString()}");
+                _logger.LogError(
+                    $"Something went wrong inside CreateStudent_ADO_Net action for {UserName}: {Error.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    $"Internal server error : {Error.ToString()}");
             }
         }
 
         // PUT: api/Student/5
         [HttpPut("UpdateStudent_ADO_Net/{StudentID}")]
         public async Task<IActionResult> UpdateStudent_ADO_Net(int StudentID,
-                                                               [FromBody] StudentForUpdateDto StudentForUpdateDto_Object,
-                                                               string UserName = "No Name")
+            [FromBody] StudentForUpdateDto StudentForUpdateDto_Object,
+            string UserName = "No Name")
         {
             try
             {
                 if (StudentID != StudentForUpdateDto_Object.StudentID)
                 {
                     //_logger.LogError($"StudentID != StudentForUpdateDto_Object.StudentID for {UserName} in action UpdateStudent");
-                    return BadRequest($"StudentID != StudentForUpdateDto_Object.StudentID for {UserName} in action UpdateStudent");
+                    return BadRequest(
+                        $"StudentID != StudentForUpdateDto_Object.StudentID for {UserName} in action UpdateStudent");
                 }
 
                 if (!ModelState.IsValid)
@@ -163,33 +178,48 @@ namespace Student_WebApi_ADO_Net.Controllers
                 }
                 else
                 {
-                    return BadRequest($"Noget gik galt, da Student med StudentId: {Student_Object.StudentID} : skulle opdateres !!!");
+                    return BadRequest(
+                        $"Noget gik galt, da Student med StudentId: {Student_Object.StudentID} : skulle opdateres !!!");
                 }
             }
             catch (Exception Error)
             {
                 //_logger.LogError($"Something went wrong inside UpdateStudent action for {UserName}: {Error.Message}");
-                return StatusCode((int)HttpStatusCode.InternalServerError, $"Internal server error : {Error.ToString()}");
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    $"Internal server error : {Error.ToString()}");
             }
         }
 
         // DELETE: api/Student/5
         [HttpDelete("DeleteStudent_ADO_Net/{StudentID}")]
         public async Task<IActionResult> DeleteStudent_ADO_Net(int StudentID,
-                                                               string UserName = "No Name")
+            string UserName = "No Name")
         {
             try
             {
-                // Implementer kode her
+                Student Student_Object = new Student();
 
-                this._logger.LogInfo($"Student with ID {StudentID} has been deleted in action DeleteStudent_ADO_Net by {UserName}");
-                return Ok($"Student with ID {StudentID} has been deleted in action DeleteStudent_ADO_Net by {UserName}");
-
+                int deleteResult = Student_Object.Delete();
+                if (deleteResult == 1)
+                {
+                    var message =
+                        $"Student with ID {StudentID} has been deleted in action DeleteStudent_ADO_Net by {UserName}";
+                    this._logger.LogInfo(message);
+                    return Ok(message);
+                }
+                else
+                {
+                    var message = $"Failed to delete Student with ID{StudentID}";
+                    this._logger.LogError(message);
+                    return BadRequest(message);   
+                }
             }
             catch (Exception Error)
             {
-                _logger.LogError($"Something went wrong inside DeleteStudent_ADO_Net action for {UserName}: {Error.Message}");
-                return StatusCode((int)HttpStatusCode.InternalServerError, $"Internal server error : {Error.ToString()}");
+                _logger.LogError(
+                    $"Something went wrong inside DeleteStudent_ADO_Net action for {UserName}: {Error.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    $"Internal server error : {Error.ToString()}");
             }
         }
     }

@@ -9,29 +9,35 @@ namespace Entities.Models
     public abstract class ORMField
     {
         protected Func<ORM, string> Getter { get; set; }
+
         public ORMField(Func<ORM, string> getter)
         {
             Getter = getter;
         }
+
         public abstract string GetSQLValue(ORM orm);
     }
+
     public class ORMInt : ORMField
     {
         public ORMInt(Func<ORM, string> getter) : base(getter)
         {
-
         }
+
         public override string GetSQLValue(ORM orm)
         {
             return Getter(orm);
         }
     }
+
     public abstract class ORM
     {
         //table             //property
-        static Dictionary<string, Dictionary<string, ORMField>> tables = new Dictionary<string, Dictionary<string, ORMField>>();
+        static Dictionary<string, Dictionary<string, ORMField>> tables =
+            new Dictionary<string, Dictionary<string, ORMField>>();
+
         static Dictionary<string, ORMField> primary_keys = new Dictionary<string, ORMField>();
-        private static SqlConnection ?DatabaseConnection = null;
+        private static SqlConnection? DatabaseConnection = null;
 
         protected static void Int(string tableName, string propertyName, Func<ORM, string> getter)
         {
@@ -39,6 +45,7 @@ namespace Entities.Models
             {
                 tables[tableName] = new Dictionary<string, ORMField>();
             }
+
             tables[tableName][propertyName] = new ORMInt(getter);
         }
 
@@ -48,6 +55,7 @@ namespace Entities.Models
         }
 
         public abstract string TableName();
+
         public int Insert()
         {
             string TABLE_NAME = TableName();
@@ -57,9 +65,8 @@ namespace Entities.Models
             ORMField primaryKey = primary_keys[TABLE_NAME];
 
             foreach (KeyValuePair<string, ORMField> kv
-                in tables[TABLE_NAME])
+                     in tables[TABLE_NAME])
             {
-
                 string propertyName = kv.Key;
                 ORMField valueType = kv.Value;
                 if (valueType.Equals(primaryKey)) continue;
@@ -84,11 +91,12 @@ namespace Entities.Models
             {
                 Console.WriteLine("Noget gik galt under Save operationen !!!");
             }
-          
+
             CloseDatabaseConnection();
 
             return (Result);
         }
+
         public int Update()
         {
             string TABLE_NAME = TableName();
@@ -136,7 +144,38 @@ namespace Entities.Models
 
         public int Delete()
         {
-            return 0;
+            string TABLE_NAME = TableName();
+            ORMField primaryKey = primary_keys[TABLE_NAME];
+            string pk_name = "";
+
+            foreach (KeyValuePair<string, ORMField> kv in tables[TABLE_NAME])
+            {
+                if (kv.Value.Equals(primaryKey))
+                {
+                    pk_name = kv.Key;
+                    break;
+                }
+            }
+
+            int pk_value = int.Parse(primaryKey.GetSQLValue(this));
+
+            string sql = $@"DELETE FROM {TABLE_NAME} 
+                         WHERE {pk_name} = {pk_value}";
+
+            Console.WriteLine(sql);
+
+            OpenDatabaseConnection();
+            SqlCommand dbCommand = new SqlCommand(sql, DatabaseConnection);
+
+            int Result = dbCommand.ExecuteNonQuery();
+            if (Result < 0)
+            {
+                Console.WriteLine("Noget gik galt under Delete operationen !!!");
+            }
+
+            CloseDatabaseConnection();
+
+            return Result;
         }
 
         public List<T> GetData<T>() where T : new()
@@ -183,8 +222,8 @@ namespace Entities.Models
                         //mappedDataList.Add(mappedDataRow);
                     }
                 }
-            } 
-            catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
@@ -192,9 +231,70 @@ namespace Entities.Models
             return GenericList;
         }
 
-        public List<T> GetDataById<T>(int Id)
+        public List<T> GetDataById<T>(int Id) where T : new()
         {
-            return null;
+            string TABLE_NAME = TableName();
+            List<T> GenericList = new List<T>();
+            var Entity = typeof(T);
+            var PropDict = new Dictionary<string, PropertyInfo>();
+
+            ORMField primaryKey = primary_keys[TABLE_NAME];
+            string pk_name = "";
+
+            foreach (KeyValuePair<string, ORMField> kv in tables[TABLE_NAME])
+            {
+                if (kv.Value.Equals(primaryKey))
+                {
+                    pk_name = kv.Key;
+                    break;
+                }
+            }
+
+            string sql = $@"SELECT * FROM {TABLE_NAME} 
+                    WHERE {pk_name} = {Id}";
+
+            OpenDatabaseConnection();
+            SqlCommand dbCommand = new SqlCommand(sql, DatabaseConnection);
+
+            try
+            {
+                var DataReader = dbCommand.ExecuteReader();
+
+                if (DataReader.HasRows)
+                {
+                    var Props = Entity.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                    PropDict = Props.ToDictionary(p => p.Name.ToUpper(), p => p);
+
+                    while (DataReader.Read())
+                    {
+                        T newObject = new T();
+
+                        for (int Index = 0; Index < DataReader.FieldCount; Index++)
+                        {
+                            if (PropDict.ContainsKey(DataReader.GetName(Index).ToUpper()))
+                            {
+                                var Info = PropDict[DataReader.GetName(Index).ToUpper()];
+
+                                if ((Info != null) && Info.CanWrite)
+                                {
+                                    var Val = DataReader.GetValue(Index);
+                                    Info.SetValue(newObject, (Val == DBNull.Value) ? null : Val, null);
+                                }
+                            }
+                        }
+
+                        GenericList.Add(newObject);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            CloseDatabaseConnection();
+
+            return GenericList;
         }
 
         public List<T> GetDataWithRelations<T>(string SQLCommandText) where T : new()
@@ -250,9 +350,70 @@ namespace Entities.Models
             return GenericList;
         }
 
-        public List<T> GetDataWithRelationsById<T>(int Id)
+        public List<T> GetDataWithRelationsById<T>(int Id) where T : new()
         {
-            return null;
+            string TABLE_NAME = TableName();
+            List<T> GenericList = new List<T>();
+            var Entity = typeof(T);
+            var PropDict = new Dictionary<string, PropertyInfo>();
+
+            ORMField primaryKey = primary_keys[TABLE_NAME];
+            string pk_name = "";
+
+            foreach (KeyValuePair<string, ORMField> kv in tables[TABLE_NAME])
+            {
+                if (kv.Value.Equals(primaryKey))
+                {
+                    pk_name = kv.Key;
+                    break;
+                }
+            }
+
+            string sql = $@"SELECT * FROM {TABLE_NAME} 
+                    WHERE {pk_name} = {Id}";
+
+            OpenDatabaseConnection();
+            SqlCommand dbCommand = new SqlCommand(sql, DatabaseConnection);
+
+            try
+            {
+                var DataReader = dbCommand.ExecuteReader();
+
+                if (DataReader.HasRows)
+                {
+                    var Props = Entity.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                    PropDict = Props.ToDictionary(p => p.Name.ToUpper(), p => p);
+
+                    while (DataReader.Read())
+                    {
+                        T newObject = new T();
+
+                        for (int Index = 0; Index < DataReader.FieldCount; Index++)
+                        {
+                            if (PropDict.ContainsKey(DataReader.GetName(Index).ToUpper()))
+                            {
+                                var Info = PropDict[DataReader.GetName(Index).ToUpper()];
+
+                                if ((Info != null) && Info.CanWrite)
+                                {
+                                    var Val = DataReader.GetValue(Index);
+                                    Info.SetValue(newObject, (Val == DBNull.Value) ? null : Val, null);
+                                }
+                            }
+                        }
+
+                        GenericList.Add(newObject);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            CloseDatabaseConnection();
+
+            return GenericList;
         }
 
         private void OpenDatabaseConnection()
@@ -281,13 +442,13 @@ namespace Entities.Models
             {
                 // Change these values to your values.
                 DataSource = "(localdb)\\mssqllocaldb", //["Server"]
-                InitialCatalog = "Student_WebApi_Core_8_0",                                       //["Database"]
-                UserID = "ltpe2",                                          // "@yourservername"  as suffix sometimes.
+                InitialCatalog = "Student_WebApi_Core_8_0", //["Database"]
+                UserID = "ltpe2", // "@yourservername"  as suffix sometimes.
                 Password = "buchwald34",
                 // Adjust these values if you like. (ADO.NET 4.5.1 or later.)
                 //ConnectRetryCount = 3,  // LTPE
                 //ConnectRetryInterval = 10, // Seconds. LTPE
-                                           // Leave these values as they are.
+                // Leave these values as they are.
                 //IntegratedSecurity = false, // LTPE
                 //Encrypt = true,
                 TrustServerCertificate = true,
